@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+  </head>
+  <body>
+    <div id="app" class="container">
+      <div class="row">
+        <div class="col">
+          <h1>Biodata Peserta</h1>
+          <form @submit.prevent="onSubmit">
+            <label>Nama Lengkap</label> <br />
+            <input type="text" v-model="data.name" /> <br />
+            <br />
+            <label>Umur</label> <br />
+            <input type="number" v-model="data.age" /> <br />
+            <br />
+            <label>Kota Kelahiran</label> <br />
+            <select v-model="data.city">
+              <option value="1">Jakarta</option>
+              <option value="2">Bandung</option>
+              <option value="3">Sukabumi</option>
+            </select>
+            <br />
+            <br />
+            <label>Jenis Kelamin</label> <br />
+            <input type="radio" v-model="data.gender" value="1" /> Male <br />
+            <input type="radio" v-model="data.gender" value="2" /> Female <br />
+            <br />
+            <label>Alamat</label> <br />
+            <textarea v-model="data.address" cols="30" rows="10"></textarea> <br />
+            <br />
+            <input type="submit" value="kirim" />
+          </form>
+        </div>
+        <div class="col">
+          <button type="button" @click="output = !output">
+            {{ output ? 'Hide' : 'Show' }} Biodata
+          </button>
+
+          <div v-show="output">
+            <p>Nama Lengkap: {{ data.name }}</p>
+            <p>Umur: {{ data.age }}</p>
+            <p>
+              Kota Kelahiran: {{ data.city == 1 ? 'Jakarta' : data.city == 2 ? 'Bandung' : data.city
+              == 3 ? 'Sukabumi' : '' }}
+            </p>
+            <p v-if="data.gender == 1">
+              Jenis Kelamin: Laki-laki
+              <i class="fa fa-male" aria-hidden="true"></i>
+            </p>
+            <p v-else-if="data.gender == 2">
+              Jenis Kelamin: Perempuan
+              <i class="fa fa-female" aria-hidden="true"></i>
+            </p>
+            <p v-else>Jenis Kelamin:</p>
+            <p>Alamat: {{ data.address }}</p>
+          </div>
+          <table>
+            <tr>
+              <th>No</th>
+              <th>Name</th>
+              <th>Age</th>
+              <th>City</th>
+              <th>Gender</th>
+              <th>Address</th>
+              <th>Action</th>
+            </tr>
+            <tr v-for="(item, index) in dataArray">
+              <td>{{ index + 1 }}</td>
+              <td>{{ item.name }}</td>
+              <td>{{ item.age }}</td>
+              <td>{{ item.city }}</td>
+              <td>{{ dataGender(item.gender) }}</td>
+              <td>{{ item.address }}</td>
+              <td>
+                <button type="button" @click="detailData(item)">Detail</button>
+              </td>
+            </tr>
+          </table>
+          <h4>Jumlah Data : {{ dataArray.length }}</h4>
+          <h5>Peserta Bernilai {{ dataGanjilGenap }}</h5>
+
+          <!-- Detail -->
+          <div class="card" v-show="showDetail" :class="data.gender == 1 ? 'bg-blue' : 'bg-pink'">
+            <h1 class="center" :style="data.gender == 1 ? 'color:blue' : 'color:red'">
+              {{ data.name }}
+            </h1>
+            <table>
+              <tr>
+                <td>Umur</td>
+                <td>:</td>
+                <td>{{ data.age }} Tahun</td>
+              </tr>
+              <tr>
+                <td>Kota Kelahiran</td>
+                <td>:</td>
+                <td>{{ data.city }}</td>
+              </tr>
+              <tr>
+                <td>Jenis Kelamin</td>
+                <td>:</td>
+                <td>{{ dataGender(data.gender) }}</td>
+              </tr>
+              <tr>
+                <td>Alamat</td>
+                <td>:</td>
+                <td>{{ data.address }}</td>
+              </tr>
+            </table>
+            <button type="button" @click="closeDetail">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <style>
+      .container {
+        padding: 50px;
+      }
+      .row {
+        display: grid;
+        grid-template-columns: auto auto;
+        gap: 20px 40px;
+      }
+      .col {
+        background-color: aliceblue;
+        padding: 10px;
+        margin: 10px 0;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-top: 10px;
+      }
+      th,
+      td {
+        text-align: left;
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+      }
+      .card {
+        border: 2px solid gray;
+        border-radius: 20px;
+        padding: 30px;
+        margin: 10px 30px;
+      }
+      .center {
+        text-align: center;
+      }
+      .bg-blue {
+        background-color: lightblue;
+      }
+      .bg-pink {
+        background-color: lightpink;
+      }
+    </style>
+
+    <script>
+      const { createApp, ref, reactive, computed } = Vue
+      createApp({
+        setup() {
+          const data = reactive({
+            name: '',
+            age: 0,
+            city: '',
+            gender: '',
+            address: ''
+          })
+          const output = ref(false)
+          const showDetail = ref(false)
+          const dataArray = ref([
+            {
+              name: 'Salman',
+              age: 22,
+              city: 1,
+              gender: 1,
+              address: 'Gunungpuyuh'
+            },
+            {
+              name: 'Ashila',
+              age: 21,
+              city: 1,
+              gender: 2,
+              address: 'Lembursitu'
+            },
+            {
+              name: 'Adinda',
+              age: 21,
+              city: 1,
+              gender: 2,
+              address: 'Cipanengah'
+            }
+          ])
+
+          const onSubmit = () => {
+            dataArray.value.push({
+              name: data.name,
+              age: data.age,
+              city: data.city,
+              gender: data.gender,
+              address: data.address
+            })
+            clearInput()
+          }
+
+          const clearInput = () => {
+            data.name = ''
+            data.age = 0
+            data.city = ''
+            data.gender = ''
+            data.address = ''
+          }
+
+          const detailData = (item) => {
+            showDetail.value = true
+            data.name = item.name
+            data.age = item.age
+            data.city = item.city
+            data.gender = item.gender
+            data.address = item.address
+          }
+
+          const closeDetail = () => {
+            clearInput()
+            showDetail.value = false
+          }
+
+          const dataGanjilGenap = computed(() => {
+            if (dataArray.value.length % 2 == 0) {
+              return 'Genap'
+            } else {
+              return 'Ganjil'
+            }
+          })
+
+          const dataGender = (item) => {
+            if (item == 1) {
+              return 'Male'
+            } else {
+              return 'Female'
+            }
+          }
+
+          return {
+            data,
+            output,
+            onSubmit,
+            dataArray,
+            dataGanjilGenap,
+            dataGender,
+            detailData,
+            closeDetail,
+            showDetail
+          }
+        }
+      }).mount('#app')
+    </script>
+  </body>
+</html>
